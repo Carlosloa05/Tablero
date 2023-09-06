@@ -1,0 +1,176 @@
+---
+title: "TABLERO DESCRIPCIÓN ESTADÍSTICA"
+author: "Carlos Mario Loaiza Cifuentes"
+output: html_document
+toc_depth: 2
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo =FALSE)
+```
+
+## **EVA (Evaluciones Agropecuarias Municipales)**
+
+Las evaluaciones agropecuarias municipales (EVA) son la base de información y conocimiento sobre la oferta productiva agropecuaria de los municipios del país (Colombia), una operación estratégica para la generación de estadísticas y la toma de decisiones en el sector.
+
+La entidad encargada de realizar las EVA es La Unidad de Planificación Rural Agropecuaria (UPRA) en coordinación con otras entidades territoriales y nacionales, estas se realizan desde 1970 y se desarrollan en módulos temáticos que se recolectan anualmente o periódicamente.
+
+
+
+```{r}
+EVArendimiento <- read.csv("C:/Users/k-mar/OneDrive - PUJ Cali/Probabilidad/EVArendimiento.csv")
+datos=EVArendimiento
+departamento=datos$DEPARTAMENTO
+departamento[departamento=="NARIÑO"]="NARINHO"
+datos$DEPARTAMENTO=departamento
+municipio=datos$MUNICIPIO
+grupo=datos$GRUPO..DE.CULTIVO
+subgrupo=datos$SUBGRUPO..DE.CULTIVO
+cultivo=datos$CULTIVO
+estado=datos$ESTADO.FISICO.PRODUCCION
+ciclo=datos$CICLO.DE.CULTIVO
+periodo=datos$PERIODO
+sembrada=datos$Área.Sembrada..ha.
+cosechada=datos$Área.Cosechada..ha.
+produccion=datos$Producción..t.
+rendimiento=datos$Rendimiento..t.ha.
+
+```
+
+### Variable DEPARTAMENTO
+Se refiere al departamento de Colombia donde se realizó la toma de los datos.
+
+
+```{r}
+library(ggplot2)
+pct=round((table(departamento)/sum(table(departamento)))*100)
+pct=data.frame(pct)
+ggplot(pct,aes(x = departamento, y = Freq,fill=rainbow(length(departamento)))) + geom_bar(stat = "identity") + labs(title = "Distribución porcentual de los datos por Departamento",x="Departamento", y = "Porcentaje") + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(breaks = seq(0, max(pct$Freq), by = 1))
+```
+
+En  esta gráfica se puede observar que:
+
+    - 7 departamentos generan  más del 50% de los datos.
+    - Hay 7 departamentos donde se tomaron muy pocosdatos o no se tomaron datos sobre cultivos.   
+    - Estos 7 departamentos se encuentran en el area periferica de colombia,en la region andina, amazonica e insular.
+
+![Mapa de colombia con sus departamentos y regiones](Tablero_arc/colombia.jpg)
+
+### Variable MUNICIPIO
+Se refiere al municipio de Colombia donde se realizó la toma de los datos.
+
+Para esta variable es algo complicado realizar una gráfica de donde se pueda obtener información general.
+
+
+```{r}
+print(length((unique(municipio))))
+```
+
+    - Los datos fueron obtenidos de 1019 municipios diferentes.
+
+### Variable GRUPO.DE.CULTIVO
+Se refiere a una agrupación(categorización) de plantas o cultivos que comparten características similares en términos de requerimientos de crecimiento, técnicas de cultivo y ciclos de cultivo.
+
+```{r}
+graf=data.frame(table(grupo))
+ggplot(graf,aes(x = grupo, y = Freq,fill=rainbow(length(grupo)))) + geom_bar(stat = "identity") + labs(title = "Cultivos por Grupo",x="Grupo", y = "Cantidad") + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(limits=c(0, max(graf$Freq)))
+```
+
+
+### Variable SUBGRUPO.DE.CULTIVO
+Se refiere a una categorización aún más específica de plantas dentro de un grupo de cultivo más amplio. Mientras que un grupo de cultivo agrupa plantas con características generales similares, como requerimientos de crecimiento o tipo de cultivo, un subgrupo de cultivo se utiliza para clasificar plantas dentro de ese grupo en función de características aún más específicas.
+
+
+```{r}
+graf=data.frame(table(subgrupo))
+ggplot(graf,aes(x = subgrupo, y = Freq,fill=rainbow(length(subgrupo)))) + geom_bar(stat = "identity") + labs(title = "Cantidad por subgrupo",x="Subgrupo", y = "Cantidad") + theme_minimal() + theme(axis.text.x = element_text(size=5,angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(limits=c(0, max(graf$Freq)))
+```
+
+
+### Variable CULTIVO
+Se refiere al cultivo del cual se obtuvieron los datos.
+
+```{r}
+graf=data.frame(table(cultivo))
+ggplot(graf,aes(x = cultivo, y = Freq,fill=rainbow(length(cultivo)))) + geom_bar(stat = "identity") + labs(title = "Cantidad por cultivo",x="cultivo", y = "Cantidad") + theme_minimal() + theme(axis.text.x = element_text(size=4,angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(limits=c(0, max(graf$Freq)))
+```
+
+
+
+### Variable ESTADO.FISICO.DE.CULTIVO
+Se refiere al tipo de producto que se obtiene del cultivo.
+
+
+```{r}
+graf=data.frame(table(estado))
+ggplot(graf,aes(x = estado, y = Freq,fill=rainbow(length(estado)))) + geom_bar(stat = "identity") + labs(title = "Cantidad por tipo de producto",x="Tipo de Producto", y = "Cantidad") + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(limits=c(0, max(graf$Freq)))
+```
+
+
+
+### Variable CICLO.DE.CULTIVO
+Se refiere al ciclo de cultivo;transitorio, anual o permanente,
+
+```{r}
+t=data.frame(table(ciclo))
+pct=round(t$Freq/sum(t$Freq)*100)
+labs=paste(t$ciclo, pct)
+labs=paste(labs, "%", sep = " ") 
+pie(t$Freq, labels=labs, main="Porcentaje de cultivos segun su ciclo",
+    col = rainbow(length(t$ciclo)))
+```
+
+
+### Variable PERIODO
+Se refiere al año y/o semestre donde se tomaron los datos dependiendo del cultivo, el semestre puede ser A(Primer semestre) o B(segundo semestre).
+
+```{r}
+graf=data.frame(table(periodo))
+ggplot(graf,aes(x = periodo, y = Freq,fill=rainbow(length(periodo)))) + geom_bar(stat = "identity") + labs(title = "Toma de datos por periodo",x="Periodo", y = "Cantidad") + theme_minimal() + theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),plot.title = element_text(hjust = 0.5)) + guides(fill = "none")+scale_y_continuous(limits=c(0, max(graf$Freq)))
+```
+
+
+### Variable Area.Sembrada
+Se refiere al area sembrada dada en hectareas (ha);para tener en cuenta; 1 hectarea = 10000 m^2.
+
+```{r}
+clasificacion=c("Pequeños(<5)", "(5<) Medianos(<50)", "(50<)Grandes")
+tclasificacion=c(sum(sembrada<=5),sum(sembrada>5 & sembrada<50),sum(sembrada>=50))
+barp=barplot(tclasificacion, names.arg = clasificacion,col=rainbow(3),ylim=c(0,sum(sembrada>=50)+8000),main="Cultivos según clasificación ")
+text(barp, tclasificacion+5000, labels = tclasificacion)
+```
+
+
+
+### Variable Area.Cosechada
+Se refiere al area dada en hectareas (ha) en la cual se obtuvo producto al momento de cosechar;para tener en cuenta; 1 hectarea = 10000 m^2.
+
+```{r}
+t=data.frame(cosechada)
+saltos=10
+bin=seq(min(cosechada), max(cosechada), by =max(cosechada)/saltos ) 
+bin=(round(bin))
+ggplot(t, aes(x = cosechada)) +geom_histogram(breaks=bin, color = rainbow(saltos),fill = rainbow(saltos)) +labs(title = "Histograma area cosechada")+theme(axis.text.x = element_text(angle = 90, vjust =0, hjust=0),plot.title = element_text(hjust = 0))+ scale_x_continuous(breaks = bin) 
+```
+
+
+### Produccion
+Se refiere a la cantidad de producto obtenida, esta variable esta dada en toneladas (t).
+
+```{r}
+t=data.frame(produccion)
+saltos=10
+bin=seq(min(produccion), max(produccion), by =max(produccion)/saltos ) 
+bin=(round(bin))
+ggplot(t, aes(x = produccion)) +geom_histogram(breaks=bin,fill = rainbow(saltos),color=rainbow(saltos)) +labs(title = "Histograma produccion")+theme(axis.text.x = element_text(angle = 90),plot.title = element_text(hjust = 0))+ scale_x_continuous(breaks = bin)
+```
+
+
+### Rendimiento
+Se refiere a la cantidad de producto obtenida por area sembrada, esta dada en toneladas por hectare (t/ha).
+
+```{r}
+boxplot(rendimiento, main="Rendimiento",col="#6abce2", las=1)
+```
+
